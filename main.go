@@ -2,9 +2,11 @@ package main
 
 import (
 	"bwa_crowdfunding/auth"
+	"bwa_crowdfunding/campaign"
 	"bwa_crowdfunding/handler"
 	"bwa_crowdfunding/helper"
 	"bwa_crowdfunding/user"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -16,7 +18,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 func main() {
 	dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -26,6 +27,19 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepository.FindByUserID(7)
+	fmt.Println("DEBUG")
+	fmt.Println(len(campaigns))
+	for _, campaign := range campaigns {
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.Name, campaign.CampaignImages[0].FileName)
+		} else {
+			fmt.Println(campaign.Name)
+		}
+	}
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
@@ -42,8 +56,8 @@ func main() {
 	router.Run()
 }
 
-func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc{
-	return func (c *gin.Context) { // gin handler tidak boleh ada paramteter lain
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+	return func(c *gin.Context) { // gin handler tidak boleh ada paramteter lain
 		authHeader := c.GetHeader("Authorization")
 
 		if !strings.Contains(authHeader, "Bearer") {
@@ -84,5 +98,3 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		c.Set("currentUser", user) // set untuk user yg login saat ini
 	}
 }
-
-
