@@ -1,0 +1,10 @@
+> go mod init namaProject
+
+API scheme 
+https://www.notion.so/
+
+Collaboration Tools
+https://whimsical.com/
+
+SLUG
+https://github.com/gosimple/slug

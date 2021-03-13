@@ -1,0 +1,12 @@
+- Users
+	id, name, occupation, email, password, avatar_file_name, role, token, created_at, updated_at
+ 
+- Campaigns
+	id, user_id, name, short_description, description, goal_amount, current_amount,
+	perks,backer_count, slug, created_at, updated_at
+	
+- Campaign Images
+	id, campaign_id, file_name, is_primary, created_at, updated_at
+
+- Transactions
+	id, campaign_id, user_id, amount, status, code, created_at, updated_at
