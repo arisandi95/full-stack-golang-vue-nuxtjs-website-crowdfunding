@@ -5,6 +5,7 @@ import (
 	"bwa_crowdfunding/campaign"
 	"bwa_crowdfunding/helper"
 	"net/http"
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -114,5 +115,55 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context){
 	}
 
 	response := helper.APIResponse("Success campaign updated", http.StatusOK, "success", campaign.FormatCampaign(updatedCampaign))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *campaignHandler) UploadImage(c *gin.Context){
+	var input campaign.CreateCampaignImageInput
+
+	//pakai ShouldBind untuk request by form
+	err := c.ShouldBind(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors" : errors}
+
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currUser := c.MustGet("currentUser").(user.User) // pake user.User karna balikannya interface kalo dari MustGet
+	userID := currUser.ID
+	input.User = currUser
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploaded" : false}
+		response := helper.APIResponse("Upload Image Failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+	// d untuk desimal, s untuk string
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded" : false}
+		response := helper.APIResponse("Upload Image Failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.service.SaveCampaignImage(input, path)
+	if err != nil {
+		data := gin.H{"is_uploaded" : false}
+		response := helper.APIResponse("Upload Image Failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded" : true}
+	response := helper.APIResponse("Upload Image Campaign Success", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 }
