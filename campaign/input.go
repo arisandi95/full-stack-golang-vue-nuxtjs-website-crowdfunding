@@ -3,6 +3,7 @@ package campaign
 import(
 	"bwa_crowdfunding/user"
 )
+
 type GetCampaignDetailInput struct {
 	ID int `uri:"id" binding:"required"`
 }
