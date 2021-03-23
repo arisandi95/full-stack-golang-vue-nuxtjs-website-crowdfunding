@@ -1,5 +1,10 @@
 package transaction
 
+import (
+	"bwa_crowdfunding/user"
+	"time"
+)
+
 type Transaction struct {
 	ID 			int 
 	CampaignID 	int 

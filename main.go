@@ -3,6 +3,7 @@ package main
 import (
 	"bwa_crowdfunding/auth"
 	"bwa_crowdfunding/campaign"
+	"bwa_crowdfunding/transaction"
 	"bwa_crowdfunding/handler"
 	"bwa_crowdfunding/helper"
 	"bwa_crowdfunding/user"
@@ -18,8 +19,8 @@ import (
 )
 
 func main() {
-	// dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -33,9 +34,11 @@ func main() {
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewsTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images", "./images") //untuk akses gambar dari api tidak 404
@@ -51,6 +54,8 @@ func main() {
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
+
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
 
 	router.Run(":9000")
 }
