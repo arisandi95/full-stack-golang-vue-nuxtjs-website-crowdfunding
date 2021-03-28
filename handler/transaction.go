@@ -29,7 +29,7 @@ func (h *transactionHandler) GetCampaignTransaction(c *gin.Context) {
 		return
 	}
 
-	currentUser := c.MustGet("currentUser").(user.User) // pake user.User karna balikannya interface kalo dari MustGet
+	currentUser := c.MustGet("currentUser").(user.User) // taro data di user.User,pake user.User karna balikannya interface kalo dari MustGet
 	input.User = currentUser
 
 	transactions, err := h.service.GetTransactionsByCampaignID(input)
@@ -40,5 +40,20 @@ func (h *transactionHandler) GetCampaignTransaction(c *gin.Context) {
 	}
 
 	response := helper.APIResponse("Campaign Transactions", http.StatusOK, "success", transaction.FormatCampaignTransactions(transactions))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(user.User) // pake user.User karna balikannya interface kalo dari MustGet
+	userID := currentUser.ID
+
+	transactions, err := h.service.GetTransactionsByUserID(userID)
+	if err != nil {
+		response := helper.APIResponse("Failed to get user transactions", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	esponse := helper.APIResponse("Success Get User Transactions", http.StatusOK, "success", transaction.FormatCampaignTransactions(transactions))
 	c.JSON(http.StatusOK, response)
 }

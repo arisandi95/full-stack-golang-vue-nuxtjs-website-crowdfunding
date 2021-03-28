@@ -19,8 +19,8 @@ import (
 )
 
 func main() {
-	dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
-	// dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -56,6 +56,7 @@ func main() {
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
 
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
+	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
 
 	router.Run(":9000")
 }
