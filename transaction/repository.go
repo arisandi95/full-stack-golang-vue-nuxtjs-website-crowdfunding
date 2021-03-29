@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"gorm.io/gorm"
+	// "fmt"
 )
 
 type repository struct {
@@ -30,8 +31,8 @@ func (r *repository) GetByCampaignID(campaignID int) ([]Transaction, error) {
 
 func (r *repository) GetByUserID(userID int) ([]Transaction, error) {
 	var transactions []Transaction
-	
-	err := r.db.Preload("Campaign.CampaignImages", "campaign_images.is_primary = 1").Where("user_id = ?", userID).Find(&transactions).Error
+
+	err := r.db.Preload("Campaign.CampaignImages", "campaign_images.is_primary = 1").Order("id desc").Where("user_id = ?", userID).Find(&transactions).Error
 	if err != nil {
 		return transactions, err
 	}
