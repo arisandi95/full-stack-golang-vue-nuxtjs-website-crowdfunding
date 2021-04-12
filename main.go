@@ -7,6 +7,7 @@ import (
 	"bwa_crowdfunding/handler"
 	"bwa_crowdfunding/helper"
 	"bwa_crowdfunding/user"
+	"bwa_crowdfunding/payment"
 	"log"
 	"net/http"
 
@@ -19,8 +20,8 @@ import (
 )
 
 func main() {
-	// dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:sands@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root@tcp(127.0.0.1:3306)/bwa_golangvuenext?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -34,7 +35,8 @@ func main() {
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
