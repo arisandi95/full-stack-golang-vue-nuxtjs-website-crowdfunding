@@ -35,12 +35,12 @@ func main() {
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-	paymentService := payment.NewService()
+	paymentService := payment.NewService(transactionRepository, campaignRepository)
 	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
-	transactionHandler := handler.NewsTransactionHandler(transactionService)
+	transactionHandler := handler.NewsTransactionHandler(transactionService, paymentService)
 
 	router := gin.Default()
 	router.Static("/images", "./images") //untuk akses gambar dari api tidak 404

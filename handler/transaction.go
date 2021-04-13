@@ -4,6 +4,7 @@ import (
 	"bwa_crowdfunding/transaction"
 	"bwa_crowdfunding/user"
 	"bwa_crowdfunding/helper"
+	"bwa_crowdfunding/payment"
 	"net/http"
 	// "fmt"
 	// "strconv"
@@ -12,10 +13,11 @@ import (
 )
 
 type transactionHandler struct {
-	service transaction.Service
+	service 		transaction.Service
+	paymentService	payment.Service 
 }
 
-func NewsTransactionHandler(service transaction.Service) *transactionHandler {
+func NewsTransactionHandler(service transaction.Service,paymentService payment.Service ) *transactionHandler {
 	return &transactionHandler{service}
 } 
 
@@ -84,4 +86,24 @@ func (h *transactionHandler) CreateTransaction(c *gin.Context) {
 	
 	response := helper.APIResponse("Success to create transaction", http.StatusOK, "success", transaction.FormatTransaction(newTransaction))
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *transactionHandler) GetNotification(c *gin.Context) {
+	var input transaction.TransactionNotificationInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("Failed to get notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = h.paymentService.ProcessPayment(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to get notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	c.JSON(http.StatusOK, input)
 }
