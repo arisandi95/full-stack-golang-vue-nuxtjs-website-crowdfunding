@@ -9,4 +9,4 @@
 	id, campaign_id, file_name, is_primary, created_at, updated_at
 
 - Transactions
-	id, campaign_id, user_id, amount, status, code, created_at, updated_at
+	id, campaign_id, user_id, amount, status, code, created_at, updated_at, payment_url
