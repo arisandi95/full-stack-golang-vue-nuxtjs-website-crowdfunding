@@ -8,3 +8,9 @@ https://whimsical.com/
 
 SLUG
 https://github.com/gosimple/slug
+
+MIDTRANS
+https://github.com/veritrans/go-midtrans
+
+CORS : agar bisa di hit oleh client
+https://github.com/gin-contrib/cors
